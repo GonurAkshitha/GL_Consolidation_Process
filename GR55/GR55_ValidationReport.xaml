@@ -1,0 +1,710 @@
+<Activity mc:Ignorable="sap sap2010" x:Class="GR55" xmlns="http://schemas.microsoft.com/netfx/2009/xaml/activities" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:mva="clr-namespace:Microsoft.VisualBasic.Activities;assembly=System.Activities" xmlns:s="clr-namespace:System;assembly=mscorlib" xmlns:sap="http://schemas.microsoft.com/netfx/2009/xaml/activities/presentation" xmlns:sap2010="http://schemas.microsoft.com/netfx/2010/xaml/activities/presentation" xmlns:scg="clr-namespace:System.Collections.Generic;assembly=mscorlib" xmlns:sd="clr-namespace:System.Data;assembly=System.Data" xmlns:sl="clr-namespace:System.Linq;assembly=System.Core" xmlns:ui="http://schemas.uipath.com/workflow/activities" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <x:Members>
+    <x:Property Name="In_Config" Type="InArgument(scg:Dictionary(x:String, x:Object))" />
+    <x:Property Name="In_StrZPL1FilePath" Type="InArgument(x:String)" />
+    <x:Property Name="In_StrZBSFilePath" Type="InArgument(x:String)" />
+    <x:Property Name="In_StrReportPath" Type="InArgument(x:String)" />
+    <x:Property Name="In_LogNotifications" Type="InArgument(sd:DataTable)" />
+    <x:Property Name="In_ProcessSartTime" Type="InArgument(s:DateTime)" />
+  </x:Members>
+  <mva:VisualBasic.Settings>
+    <x:Null />
+  </mva:VisualBasic.Settings>
+  <sap:VirtualizedContainerService.HintSize>546,1994</sap:VirtualizedContainerService.HintSize>
+  <sap2010:WorkflowViewState.IdRef>GR55_1</sap2010:WorkflowViewState.IdRef>
+  <TextExpression.NamespacesForImplementation>
+    <scg:List x:TypeArguments="x:String" Capacity="24">
+      <x:String>System.Activities</x:String>
+      <x:String>System.Activities.Statements</x:String>
+      <x:String>System.Activities.Expressions</x:String>
+      <x:String>System.Activities.Validation</x:String>
+      <x:String>System.Activities.XamlIntegration</x:String>
+      <x:String>Microsoft.VisualBasic</x:String>
+      <x:String>Microsoft.VisualBasic.Activities</x:String>
+      <x:String>System</x:String>
+      <x:String>System.Collections</x:String>
+      <x:String>System.Collections.Generic</x:String>
+      <x:String>System.Data</x:String>
+      <x:String>System.Diagnostics</x:String>
+      <x:String>System.Drawing</x:String>
+      <x:String>System.IO</x:String>
+      <x:String>System.Linq</x:String>
+      <x:String>System.Net.Mail</x:String>
+      <x:String>System.Xml</x:String>
+      <x:String>System.Xml.Linq</x:String>
+      <x:String>UiPath.Core</x:String>
+      <x:String>UiPath.Core.Activities</x:String>
+      <x:String>System.Windows.Markup</x:String>
+      <x:String>Microsoft.VisualBasic.CompilerServices</x:String>
+      <x:String>UiPath.Excel</x:String>
+      <x:String>System.Xml.Serialization</x:String>
+    </scg:List>
+  </TextExpression.NamespacesForImplementation>
+  <TextExpression.ReferencesForImplementation>
+    <scg:List x:TypeArguments="AssemblyReference" Capacity="22">
+      <AssemblyReference>System.Activities</AssemblyReference>
+      <AssemblyReference>Microsoft.VisualBasic</AssemblyReference>
+      <AssemblyReference>mscorlib</AssemblyReference>
+      <AssemblyReference>System.Data</AssemblyReference>
+      <AssemblyReference>System.Data.DataSetExtensions</AssemblyReference>
+      <AssemblyReference>System</AssemblyReference>
+      <AssemblyReference>System.Drawing</AssemblyReference>
+      <AssemblyReference>System.Core</AssemblyReference>
+      <AssemblyReference>System.Xml</AssemblyReference>
+      <AssemblyReference>System.Xml.Linq</AssemblyReference>
+      <AssemblyReference>PresentationFramework</AssemblyReference>
+      <AssemblyReference>WindowsBase</AssemblyReference>
+      <AssemblyReference>PresentationCore</AssemblyReference>
+      <AssemblyReference>System.Xaml</AssemblyReference>
+      <AssemblyReference>UiPath.System.Activities</AssemblyReference>
+      <AssemblyReference>UiPath.UiAutomation.Activities</AssemblyReference>
+      <AssemblyReference>System.ServiceModel</AssemblyReference>
+      <AssemblyReference>System.ValueTuple</AssemblyReference>
+      <AssemblyReference>System.ComponentModel.Composition</AssemblyReference>
+      <AssemblyReference>UiPath.Excel.Activities</AssemblyReference>
+      <AssemblyReference>UiPath.Excel</AssemblyReference>
+      <AssemblyReference>System.Runtime.WindowsRuntime</AssemblyReference>
+    </scg:List>
+  </TextExpression.ReferencesForImplementation>
+  <Sequence sap2010:Annotation.AnnotationText="Description: GL Consolidation Validation&#xA;&#xA;• Check for net income and current year retained earnings:&#xA;o Current year retained earnings = balance of 300135&#xA;o Net income = balance at the very end of a P&amp;L report&#xA;• Check for equity clearing account balance&#xA;o Balance should be zero; but report the results for GL account 300180&#xA;• Check for investment in sub elimination&#xA;o Balance should be zero; but report the results for GL account &#xA;&#xA;Dev details: Created by Shivani Karla on 20th Feb 2020" DisplayName="GR55" sap:VirtualizedContainerService.HintSize="526,1934" sap2010:WorkflowViewState.IdRef="Sequence_12">
+    <Sequence.Variables>
+      <Variable x:TypeArguments="sd:DataTable" Name="vDT_ZBSData" />
+      <Variable x:TypeArguments="sd:DataTable" Name="vDT_ZPLData" />
+      <Variable x:TypeArguments="sd:DataTable" Name="vDT_ValidateData" />
+      <Variable x:TypeArguments="x:String" Name="vStr_EarningValue" />
+      <Variable x:TypeArguments="x:Boolean" Name="vBool_ValidFolderExists" />
+      <Variable x:TypeArguments="s:DateTime" Name="vTime_FileCreationDate" />
+      <Variable x:TypeArguments="scg:IEnumerable(x:String)" Default="[new List(of string)]" Name="vList_ReportFiles" />
+      <Variable x:TypeArguments="x:Boolean" Name="vBoolZPLExists" />
+    </Sequence.Variables>
+    <sap:WorkflowViewStateService.ViewState>
+      <scg:Dictionary x:TypeArguments="x:String, x:Object">
+        <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+        <x:Boolean x:Key="IsPinned">False</x:Boolean>
+        <x:Boolean x:Key="IsAnnotationDocked">True</x:Boolean>
+      </scg:Dictionary>
+    </sap:WorkflowViewStateService.ViewState>
+    <ui:InvokeWorkflowFile ContinueOnError="{x:Null}" DisplayName="Invoke LogFile workflow-LOG-GL67" sap:VirtualizedContainerService.HintSize="484,51" sap2010:WorkflowViewState.IdRef="InvokeWorkflowFile_3" UnSafe="False" WorkflowFileName="LogandReport\LogFile.xaml">
+      <ui:InvokeWorkflowFile.Arguments>
+        <InArgument x:TypeArguments="x:String" x:Key="argIstrLogNumber">LOG-GL67</InArgument>
+        <InArgument x:TypeArguments="scg:Dictionary(x:String, x:Object)" x:Key="argIdicConfig">[In_Config]</InArgument>
+        <InArgument x:TypeArguments="x:String" x:Key="argIstrKeyValues">Validation</InArgument>
+        <InArgument x:TypeArguments="x:String" x:Key="argIstrErrorScreenshot" />
+        <InArgument x:TypeArguments="sd:DataTable" x:Key="argIdtLogNotification">[In_LogNotifications]</InArgument>
+        <InArgument x:TypeArguments="x:String" x:Key="arglstrTechincalExceptionMessage" />
+        <OutArgument x:TypeArguments="x:String" x:Key="argOException" />
+        <InArgument x:TypeArguments="x:Int32" x:Key="argIstrTransactionID" />
+        <InArgument x:TypeArguments="x:String" x:Key="argInDBConnectionString">[In_Config("DB_ConnectionString").ToString]</InArgument>
+      </ui:InvokeWorkflowFile.Arguments>
+      <sap:WorkflowViewStateService.ViewState>
+        <scg:Dictionary x:TypeArguments="x:String, x:Object">
+          <x:Boolean x:Key="IsExpanded">False</x:Boolean>
+          <x:Boolean x:Key="IsPinned">False</x:Boolean>
+        </scg:Dictionary>
+      </sap:WorkflowViewStateService.ViewState>
+    </ui:InvokeWorkflowFile>
+    <ui:BuildDataTable DataTable="[vDT_ValidateData]" DisplayName="Report Build Data Table" sap:VirtualizedContainerService.HintSize="484,51" sap2010:WorkflowViewState.IdRef="BuildDataTable_2" TableInfo="&lt;NewDataSet&gt;&#xA;  &lt;xs:schema id=&quot;NewDataSet&quot; xmlns=&quot;&quot; xmlns:xs=&quot;http://www.w3.org/2001/XMLSchema&quot; xmlns:msdata=&quot;urn:schemas-microsoft-com:xml-msdata&quot;&gt;&#xA;    &lt;xs:element name=&quot;NewDataSet&quot; msdata:IsDataSet=&quot;true&quot; msdata:MainDataTable=&quot;TableName&quot; msdata:UseCurrentLocale=&quot;true&quot;&gt;&#xA;      &lt;xs:complexType&gt;&#xA;        &lt;xs:choice minOccurs=&quot;0&quot; maxOccurs=&quot;unbounded&quot;&gt;&#xA;          &lt;xs:element name=&quot;TableName&quot;&gt;&#xA;            &lt;xs:complexType&gt;&#xA;              &lt;xs:sequence&gt;&#xA;                &lt;xs:element name=&quot;GL_Account&quot; minOccurs=&quot;0&quot;&gt;&#xA;                  &lt;xs:simpleType&gt;&#xA;                    &lt;xs:restriction base=&quot;xs:string&quot;&gt;&#xA;                      &lt;xs:maxLength value=&quot;100&quot; /&gt;&#xA;                    &lt;/xs:restriction&gt;&#xA;                  &lt;/xs:simpleType&gt;&#xA;                &lt;/xs:element&gt;&#xA;                &lt;xs:element name=&quot;Balance-CY&quot; type=&quot;xs:string&quot; minOccurs=&quot;0&quot; /&gt;&#xA;                &lt;xs:element name=&quot;ZPL_NetIncome&quot; type=&quot;xs:string&quot; minOccurs=&quot;0&quot; /&gt;&#xA;                &lt;xs:element name=&quot;Output&quot; type=&quot;xs:string&quot; minOccurs=&quot;0&quot; /&gt;&#xA;              &lt;/xs:sequence&gt;&#xA;            &lt;/xs:complexType&gt;&#xA;          &lt;/xs:element&gt;&#xA;        &lt;/xs:choice&gt;&#xA;      &lt;/xs:complexType&gt;&#xA;    &lt;/xs:element&gt;&#xA;  &lt;/xs:schema&gt;&#xA;&lt;/NewDataSet&gt;">
+      <sap:WorkflowViewStateService.ViewState>
+        <scg:Dictionary x:TypeArguments="x:String, x:Object">
+          <x:Boolean x:Key="IsExpanded">False</x:Boolean>
+          <x:Boolean x:Key="IsPinned">False</x:Boolean>
+        </scg:Dictionary>
+      </sap:WorkflowViewStateService.ViewState>
+    </ui:BuildDataTable>
+    <ui:PathExists DisplayName="Path Exists- ZBS FOlder" Exists="[vBoolZPLExists]" sap:VirtualizedContainerService.HintSize="484,51" sap2010:WorkflowViewState.IdRef="PathExists_4" Path="[In_Config(&quot;GL_SharedPath&quot;).ToString+In_Config(&quot;ShareFile_ReportsFolderName&quot;).ToString.Replace(&quot;&lt;Month&gt;&quot;,now.date.ToString(&quot;MMMMMMMMMMMMM&quot;))+&quot;Zbs3&quot;]" PathType="Folder">
+      <sap:WorkflowViewStateService.ViewState>
+        <scg:Dictionary x:TypeArguments="x:String, x:Object">
+          <x:Boolean x:Key="IsExpanded">False</x:Boolean>
+          <x:Boolean x:Key="IsPinned">False</x:Boolean>
+        </scg:Dictionary>
+      </sap:WorkflowViewStateService.ViewState>
+    </ui:PathExists>
+    <If Condition="[vBoolZPLExists]" DisplayName="If Folder Exists" sap:VirtualizedContainerService.HintSize="484,51" sap2010:WorkflowViewState.IdRef="If_22">
+      <sap:WorkflowViewStateService.ViewState>
+        <scg:Dictionary x:TypeArguments="x:String, x:Object">
+          <x:Boolean x:Key="IsExpanded">False</x:Boolean>
+          <x:Boolean x:Key="IsPinned">False</x:Boolean>
+        </scg:Dictionary>
+      </sap:WorkflowViewStateService.ViewState>
+      <If.Then>
+        <Assign DisplayName="Assign Get Files" sap:VirtualizedContainerService.HintSize="262,60" sap2010:WorkflowViewState.IdRef="Assign_11">
+          <Assign.To>
+            <OutArgument x:TypeArguments="scg:IEnumerable(x:String)">[vList_ReportFiles]</OutArgument>
+          </Assign.To>
+          <Assign.Value>
+            <InArgument x:TypeArguments="sl:IOrderedEnumerable(x:String)">[Directory.GetFiles(In_Config("GL_SharedPath").ToString+In_Config("ShareFile_ReportsFolderName").ToString.Replace("&lt;Month&gt;",now.date.ToString("MMMMMMMMMMMMM"))+"Zbs3").OrderByDescending(Function(d) New FileInfo(d).CreatedDate)]</InArgument>
+          </Assign.Value>
+          <sap:WorkflowViewStateService.ViewState>
+            <scg:Dictionary x:TypeArguments="x:String, x:Object">
+              <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+            </scg:Dictionary>
+          </sap:WorkflowViewStateService.ViewState>
+        </Assign>
+      </If.Then>
+      <If.Else>
+        <Assign DisplayName="Assign Get Files- 0" sap:VirtualizedContainerService.HintSize="262,60" sap2010:WorkflowViewState.IdRef="Assign_17">
+          <Assign.To>
+            <OutArgument x:TypeArguments="scg:IEnumerable(x:String)">[vList_ReportFiles]</OutArgument>
+          </Assign.To>
+          <Assign.Value>
+            <InArgument x:TypeArguments="scg:List(x:String)">[new List(of string)]</InArgument>
+          </Assign.Value>
+          <sap:WorkflowViewStateService.ViewState>
+            <scg:Dictionary x:TypeArguments="x:String, x:Object">
+              <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+            </scg:Dictionary>
+          </sap:WorkflowViewStateService.ViewState>
+        </Assign>
+      </If.Else>
+    </If>
+    <If Condition="[vList_ReportFiles.Count&gt;0]" DisplayName="If ZB3 Exists" sap:VirtualizedContainerService.HintSize="484,51" sap2010:WorkflowViewState.IdRef="If_19">
+      <sap:WorkflowViewStateService.ViewState>
+        <scg:Dictionary x:TypeArguments="x:String, x:Object">
+          <x:Boolean x:Key="IsExpanded">False</x:Boolean>
+          <x:Boolean x:Key="IsPinned">False</x:Boolean>
+        </scg:Dictionary>
+      </sap:WorkflowViewStateService.ViewState>
+      <If.Then>
+        <Sequence sap:VirtualizedContainerService.HintSize="304,434" sap2010:WorkflowViewState.IdRef="Sequence_15">
+          <sap:WorkflowViewStateService.ViewState>
+            <scg:Dictionary x:TypeArguments="x:String, x:Object">
+              <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+              <x:Boolean x:Key="IsPinned">False</x:Boolean>
+            </scg:Dictionary>
+          </sap:WorkflowViewStateService.ViewState>
+          <ui:LogMessage DisplayName="Log Message" sap:VirtualizedContainerService.HintSize="262,51" sap2010:WorkflowViewState.IdRef="LogMessage_18" Level="Info" Message="[&quot;FIles present in ZBS Folder&quot;]">
+            <sap:WorkflowViewStateService.ViewState>
+              <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                <x:Boolean x:Key="IsExpanded">False</x:Boolean>
+                <x:Boolean x:Key="IsPinned">False</x:Boolean>
+              </scg:Dictionary>
+            </sap:WorkflowViewStateService.ViewState>
+          </ui:LogMessage>
+          <Assign DisplayName="Assign Zbs Path" sap:VirtualizedContainerService.HintSize="262,60" sap2010:WorkflowViewState.IdRef="Assign_7">
+            <Assign.To>
+              <OutArgument x:TypeArguments="x:String">[In_StrZBSFilePath]</OutArgument>
+            </Assign.To>
+            <Assign.Value>
+              <InArgument x:TypeArguments="x:String">[Directory.GetFiles(In_Config("GL_SharedPath").ToString+In_Config("ShareFile_ReportsFolderName").ToString.Replace("&lt;Month&gt;",now.date.ToString("MMMMMMMMMMMMM"))+"Zbs3","*.xls",SearchOption.AllDirectories).OrderByDescending(Function(d) New FileInfo(d).CreationTime).Tolist(0)]</InArgument>
+            </Assign.Value>
+          </Assign>
+          <Assign DisplayName="Assign Create date" sap:VirtualizedContainerService.HintSize="262,60" sap2010:WorkflowViewState.IdRef="Assign_8">
+            <Assign.To>
+              <OutArgument x:TypeArguments="s:DateTime">[vTime_FileCreationDate]</OutArgument>
+            </Assign.To>
+            <Assign.Value>
+              <InArgument x:TypeArguments="s:DateTime">[new FileInfo(In_StrZBSFilePath).CreationTime]</InArgument>
+            </Assign.Value>
+          </Assign>
+          <If Condition="[vTime_FileCreationDate&gt;In_ProcessSartTime]" DisplayName="If ZBS file present" sap:VirtualizedContainerService.HintSize="262,51" sap2010:WorkflowViewState.IdRef="If_10">
+            <sap:WorkflowViewStateService.ViewState>
+              <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                <x:Boolean x:Key="IsExpanded">False</x:Boolean>
+                <x:Boolean x:Key="IsPinned">False</x:Boolean>
+              </scg:Dictionary>
+            </sap:WorkflowViewStateService.ViewState>
+            <If.Then>
+              <Sequence sap:VirtualizedContainerService.HintSize="242,234" sap2010:WorkflowViewState.IdRef="Sequence_13">
+                <sap:WorkflowViewStateService.ViewState>
+                  <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                    <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+                  </scg:Dictionary>
+                </sap:WorkflowViewStateService.ViewState>
+                <ui:InvokeWorkflowFile ContinueOnError="{x:Null}" DisplayName="Invoke LogFile workflow-LOG-GL68" sap:VirtualizedContainerService.HintSize="200,51" sap2010:WorkflowViewState.IdRef="InvokeWorkflowFile_1" UnSafe="False" WorkflowFileName="LogandReport\LogFile.xaml">
+                  <ui:InvokeWorkflowFile.Arguments>
+                    <InArgument x:TypeArguments="x:String" x:Key="argIstrLogNumber">LOG-GL68</InArgument>
+                    <InArgument x:TypeArguments="scg:Dictionary(x:String, x:Object)" x:Key="argIdicConfig">[In_Config]</InArgument>
+                    <InArgument x:TypeArguments="x:String" x:Key="argIstrKeyValues">["ZBS: "+In_StrZBSFilePath]</InArgument>
+                    <InArgument x:TypeArguments="x:String" x:Key="argIstrErrorScreenshot" />
+                    <InArgument x:TypeArguments="sd:DataTable" x:Key="argIdtLogNotification">[In_LogNotifications]</InArgument>
+                    <InArgument x:TypeArguments="x:String" x:Key="arglstrTechincalExceptionMessage" />
+                    <OutArgument x:TypeArguments="x:String" x:Key="argOException" />
+                    <InArgument x:TypeArguments="x:Int32" x:Key="argIstrTransactionID" />
+                    <InArgument x:TypeArguments="x:String" x:Key="argInDBConnectionString">[In_Config("DB_ConnectionString").ToString]</InArgument>
+                  </ui:InvokeWorkflowFile.Arguments>
+                  <sap:WorkflowViewStateService.ViewState>
+                    <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                      <x:Boolean x:Key="IsExpanded">False</x:Boolean>
+                      <x:Boolean x:Key="IsPinned">False</x:Boolean>
+                    </scg:Dictionary>
+                  </sap:WorkflowViewStateService.ViewState>
+                </ui:InvokeWorkflowFile>
+                <ui:ReadRange AddHeaders="True" DataTable="[vDT_ZBSData]" DisplayName="Read Range- ZBS" sap:VirtualizedContainerService.HintSize="200,51" sap2010:WorkflowViewState.IdRef="ReadRange_4" PreserveFormat="True" SheetName="[In_Config(&quot;ReportsSheetName&quot;).ToString]" WorkbookPath="[In_StrZBSFilePath]">
+                  <ui:ReadRange.Range>
+                    <InArgument x:TypeArguments="x:String">
+                      <Literal x:TypeArguments="x:String" Value="" />
+                    </InArgument>
+                  </ui:ReadRange.Range>
+                  <sap:WorkflowViewStateService.ViewState>
+                    <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                      <x:Boolean x:Key="IsExpanded">False</x:Boolean>
+                      <x:Boolean x:Key="IsPinned">False</x:Boolean>
+                    </scg:Dictionary>
+                  </sap:WorkflowViewStateService.ViewState>
+                </ui:ReadRange>
+              </Sequence>
+            </If.Then>
+            <If.Else>
+              <Sequence sap:VirtualizedContainerService.HintSize="200,66" sap2010:WorkflowViewState.IdRef="Sequence_8">
+                <sap:WorkflowViewStateService.ViewState>
+                  <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                    <x:Boolean x:Key="IsExpanded">False</x:Boolean>
+                    <x:Boolean x:Key="IsPinned">False</x:Boolean>
+                  </scg:Dictionary>
+                </sap:WorkflowViewStateService.ViewState>
+                <ui:InvokeWorkflowFile ContinueOnError="{x:Null}" DisplayName="Invoke LogFile workflow-LOG-GL69" sap:VirtualizedContainerService.HintSize="200,51" sap2010:WorkflowViewState.IdRef="InvokeWorkflowFile_2" UnSafe="False" WorkflowFileName="LogandReport\LogFile.xaml">
+                  <ui:InvokeWorkflowFile.Arguments>
+                    <InArgument x:TypeArguments="x:String" x:Key="argIstrLogNumber">LOG-GL69</InArgument>
+                    <InArgument x:TypeArguments="scg:Dictionary(x:String, x:Object)" x:Key="argIdicConfig">[In_Config]</InArgument>
+                    <InArgument x:TypeArguments="x:String" x:Key="argIstrKeyValues">Validation</InArgument>
+                    <InArgument x:TypeArguments="x:String" x:Key="argIstrErrorScreenshot" />
+                    <InArgument x:TypeArguments="sd:DataTable" x:Key="argIdtLogNotification">[In_LogNotifications]</InArgument>
+                    <InArgument x:TypeArguments="x:String" x:Key="arglstrTechincalExceptionMessage" />
+                    <OutArgument x:TypeArguments="x:String" x:Key="argOException" />
+                    <InArgument x:TypeArguments="x:Int32" x:Key="argIstrTransactionID" />
+                    <InArgument x:TypeArguments="x:String" x:Key="argInDBConnectionString">[In_Config("DB_ConnectionString").ToString]</InArgument>
+                  </ui:InvokeWorkflowFile.Arguments>
+                  <sap:WorkflowViewStateService.ViewState>
+                    <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                      <x:Boolean x:Key="IsExpanded">False</x:Boolean>
+                      <x:Boolean x:Key="IsPinned">False</x:Boolean>
+                    </scg:Dictionary>
+                  </sap:WorkflowViewStateService.ViewState>
+                </ui:InvokeWorkflowFile>
+                <ui:AddDataRow DataRow="{x:Null}" ArrayRow="[{&quot;161010&quot;,&quot;&quot;,&quot;&quot;,&quot;ZBS file not present to perform validation&quot;}]" DataTable="[vDT_ValidateData]" DisplayName="Add Data Row-ZBS" sap:VirtualizedContainerService.HintSize="200,22" sap2010:WorkflowViewState.IdRef="AddDataRow_12" />
+                <ui:WriteRange AddHeaders="True" DataTable="[vDT_ValidateData]" DisplayName="Write Variant Report Range" sap:VirtualizedContainerService.HintSize="200,51" sap2010:WorkflowViewState.IdRef="WriteRange_5" SheetName="Validation- Exception" StartingCell="A1" WorkbookPath="[In_StrReportPath]">
+                  <sap:WorkflowViewStateService.ViewState>
+                    <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                      <x:Boolean x:Key="IsExpanded">False</x:Boolean>
+                      <x:Boolean x:Key="IsPinned">False</x:Boolean>
+                    </scg:Dictionary>
+                  </sap:WorkflowViewStateService.ViewState>
+                </ui:WriteRange>
+                <Throw Exception="[new BusinessRuleException(&quot; ZBS File NoT Found&quot;)]" sap:VirtualizedContainerService.HintSize="200,22" sap2010:WorkflowViewState.IdRef="Throw_5" />
+              </Sequence>
+            </If.Else>
+          </If>
+        </Sequence>
+      </If.Then>
+      <If.Else>
+        <Sequence sap:VirtualizedContainerService.HintSize="242,449" sap2010:WorkflowViewState.IdRef="Sequence_16">
+          <sap:WorkflowViewStateService.ViewState>
+            <scg:Dictionary x:TypeArguments="x:String, x:Object">
+              <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+              <x:Boolean x:Key="IsPinned">False</x:Boolean>
+            </scg:Dictionary>
+          </sap:WorkflowViewStateService.ViewState>
+          <ui:LogMessage DisplayName="Log Message" sap:VirtualizedContainerService.HintSize="200,51" sap2010:WorkflowViewState.IdRef="LogMessage_19" Level="Info" Message="[&quot;Folder not found or Files not present - ZBS3&quot;]">
+            <sap:WorkflowViewStateService.ViewState>
+              <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                <x:Boolean x:Key="IsExpanded">False</x:Boolean>
+                <x:Boolean x:Key="IsPinned">False</x:Boolean>
+              </scg:Dictionary>
+            </sap:WorkflowViewStateService.ViewState>
+          </ui:LogMessage>
+          <ui:InvokeWorkflowFile ContinueOnError="{x:Null}" DisplayName="Invoke LogFile workflow-LOG-GL69" sap:VirtualizedContainerService.HintSize="200,51" sap2010:WorkflowViewState.IdRef="InvokeWorkflowFile_6" UnSafe="False" WorkflowFileName="LogandReport\LogFile.xaml">
+            <ui:InvokeWorkflowFile.Arguments>
+              <InArgument x:TypeArguments="x:String" x:Key="argIstrLogNumber">LOG-GL69</InArgument>
+              <InArgument x:TypeArguments="scg:Dictionary(x:String, x:Object)" x:Key="argIdicConfig">[In_Config]</InArgument>
+              <InArgument x:TypeArguments="x:String" x:Key="argIstrKeyValues">Validation</InArgument>
+              <InArgument x:TypeArguments="x:String" x:Key="argIstrErrorScreenshot" />
+              <InArgument x:TypeArguments="sd:DataTable" x:Key="argIdtLogNotification">[In_LogNotifications]</InArgument>
+              <InArgument x:TypeArguments="x:String" x:Key="arglstrTechincalExceptionMessage" />
+              <OutArgument x:TypeArguments="x:String" x:Key="argOException" />
+              <InArgument x:TypeArguments="x:Int32" x:Key="argIstrTransactionID" />
+              <InArgument x:TypeArguments="x:String" x:Key="argInDBConnectionString">[In_Config("DB_ConnectionString").ToString]</InArgument>
+            </ui:InvokeWorkflowFile.Arguments>
+            <sap:WorkflowViewStateService.ViewState>
+              <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                <x:Boolean x:Key="IsExpanded">False</x:Boolean>
+                <x:Boolean x:Key="IsPinned">False</x:Boolean>
+              </scg:Dictionary>
+            </sap:WorkflowViewStateService.ViewState>
+          </ui:InvokeWorkflowFile>
+          <ui:AddDataRow DataRow="{x:Null}" ArrayRow="[{&quot;161010&quot;,&quot;&quot;,&quot;&quot;,&quot;ZBS file not present to perform validation&quot;}]" DataTable="[vDT_ValidateData]" DisplayName="Add Data Row-ZBS" sap:VirtualizedContainerService.HintSize="200,22" sap2010:WorkflowViewState.IdRef="AddDataRow_22" />
+          <ui:WriteRange AddHeaders="True" DataTable="[vDT_ValidateData]" DisplayName="Write Variant Report Range" sap:VirtualizedContainerService.HintSize="200,51" sap2010:WorkflowViewState.IdRef="WriteRange_9" SheetName="Validation- Exception" StartingCell="A1" WorkbookPath="[In_StrReportPath]">
+            <sap:WorkflowViewStateService.ViewState>
+              <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                <x:Boolean x:Key="IsExpanded">False</x:Boolean>
+                <x:Boolean x:Key="IsPinned">False</x:Boolean>
+              </scg:Dictionary>
+            </sap:WorkflowViewStateService.ViewState>
+          </ui:WriteRange>
+          <Throw Exception="[new BusinessRuleException(&quot; ZBS File NoT Found&quot;)]" sap:VirtualizedContainerService.HintSize="200,22" sap2010:WorkflowViewState.IdRef="Throw_7" />
+        </Sequence>
+      </If.Else>
+    </If>
+    <If Condition="[vDT_ZBSData.Select(&quot;[Lead column] like '%&quot;+In_Config(&quot;GL_ValidationAccount1&quot;).ToString+&quot;%'&quot;).Length&gt;0]" DisplayName="If 161010 account present " sap:VirtualizedContainerService.HintSize="484,51" sap2010:WorkflowViewState.IdRef="If_12">
+      <sap:WorkflowViewStateService.ViewState>
+        <scg:Dictionary x:TypeArguments="x:String, x:Object">
+          <x:Boolean x:Key="IsExpanded">False</x:Boolean>
+          <x:Boolean x:Key="IsPinned">False</x:Boolean>
+        </scg:Dictionary>
+      </sap:WorkflowViewStateService.ViewState>
+      <If.Then>
+        <If Condition="[vDT_ZBSData.Select(&quot;[Lead column] like '%&quot;+In_Config(&quot;GL_ValidationAccount1&quot;).ToString+&quot;%'&quot;).copytodatatable.Rows(0).Item(&quot;Cons. Bal. CY&quot;).ToString.Trim=&quot;0&quot;]" DisplayName="If Balance is 0" sap:VirtualizedContainerService.HintSize="200,51" sap2010:WorkflowViewState.IdRef="If_11">
+          <sap:WorkflowViewStateService.ViewState>
+            <scg:Dictionary x:TypeArguments="x:String, x:Object">
+              <x:Boolean x:Key="IsExpanded">False</x:Boolean>
+              <x:Boolean x:Key="IsPinned">False</x:Boolean>
+            </scg:Dictionary>
+          </sap:WorkflowViewStateService.ViewState>
+          <If.Then>
+            <ui:AddDataRow DataRow="{x:Null}" ArrayRow="[{In_Config(&quot;GL_ValidationAccount1&quot;).ToString,&quot;'&quot;+vDT_ZBSData.Select(&quot;[Lead column] like '%&quot;+In_Config(&quot;GL_ValidationAccount1&quot;).ToString+&quot;%'&quot;).copytodatatable.Rows(0).Item(&quot;Cons. Bal. CY&quot;).ToString.Trim,&quot;&quot;,&quot;Valid&quot;}]" DataTable="[vDT_ValidateData]" DisplayName="Add Data Row" sap:VirtualizedContainerService.HintSize="200,22" sap2010:WorkflowViewState.IdRef="AddDataRow_13" />
+          </If.Then>
+          <If.Else>
+            <ui:AddDataRow DataRow="{x:Null}" ArrayRow="[{In_Config(&quot;GL_ValidationAccount1&quot;).ToString,&quot;'&quot;+vDT_ZBSData.Select(&quot;[Lead column] like '%&quot;+In_Config(&quot;GL_ValidationAccount1&quot;).ToString+&quot;%'&quot;).copytodatatable.Rows(0).Item(&quot;Cons. Bal. CY&quot;).ToString.Trim,&quot;&quot;,&quot;Invalid&quot;}]" DataTable="[vDT_ValidateData]" DisplayName="Add Data Row" sap:VirtualizedContainerService.HintSize="200,22" sap2010:WorkflowViewState.IdRef="AddDataRow_14" />
+          </If.Else>
+        </If>
+      </If.Then>
+      <If.Else>
+        <ui:AddDataRow DataRow="{x:Null}" ArrayRow="[{&quot;161010&quot;,&quot;&quot;,&quot;&quot;,&quot;Account not present on ZBS report&quot;}]" DataTable="[vDT_ValidateData]" DisplayName="Add Data Row-ZBS" sap:VirtualizedContainerService.HintSize="200,22" sap2010:WorkflowViewState.IdRef="AddDataRow_15" />
+      </If.Else>
+    </If>
+    <If Condition="[vDT_ZBSData.Select(&quot;[Lead column] like '%&quot;+In_Config(&quot;GL_ValidationAccount2&quot;).ToString+&quot;%'&quot;).Length&gt;0]" DisplayName="If 300180 account present" sap:VirtualizedContainerService.HintSize="484,51" sap2010:WorkflowViewState.IdRef="If_14">
+      <sap:WorkflowViewStateService.ViewState>
+        <scg:Dictionary x:TypeArguments="x:String, x:Object">
+          <x:Boolean x:Key="IsExpanded">False</x:Boolean>
+          <x:Boolean x:Key="IsPinned">False</x:Boolean>
+        </scg:Dictionary>
+      </sap:WorkflowViewStateService.ViewState>
+      <If.Then>
+        <If Condition="[vDT_ZBSData.Select(&quot;[Lead column] like '%&quot;+In_Config(&quot;GL_ValidationAccount2&quot;).ToString+&quot;%'&quot;).copytodatatable.Rows(0).Item(&quot;Cons. Bal. CY&quot;).ToString.Trim=&quot;0&quot;]" DisplayName="If account balance is 0" sap:VirtualizedContainerService.HintSize="200,51" sap2010:WorkflowViewState.IdRef="If_13">
+          <sap:WorkflowViewStateService.ViewState>
+            <scg:Dictionary x:TypeArguments="x:String, x:Object">
+              <x:Boolean x:Key="IsExpanded">False</x:Boolean>
+              <x:Boolean x:Key="IsPinned">False</x:Boolean>
+            </scg:Dictionary>
+          </sap:WorkflowViewStateService.ViewState>
+          <If.Then>
+            <ui:AddDataRow DataRow="{x:Null}" ArrayRow="[{In_Config(&quot;GL_ValidationAccount2&quot;).ToString,&quot;'&quot;+vDT_ZBSData.Select(&quot;[Lead column] like '%&quot;+In_Config(&quot;GL_ValidationAccount2&quot;).ToString+&quot;%'&quot;).copytodatatable.Rows(0).Item(&quot;Cons. Bal. CY&quot;).ToString.Trim,&quot;&quot;,&quot;Valid&quot;}]" DataTable="[vDT_ValidateData]" DisplayName="Add Data Row" sap:VirtualizedContainerService.HintSize="200,22" sap2010:WorkflowViewState.IdRef="AddDataRow_16" />
+          </If.Then>
+          <If.Else>
+            <ui:AddDataRow DataRow="{x:Null}" ArrayRow="[{In_Config(&quot;GL_ValidationAccount2&quot;).ToString,&quot;'&quot;+vDT_ZBSData.Select(&quot;[Lead column] like '%&quot;+In_Config(&quot;GL_ValidationAccount2&quot;).ToString+&quot;%'&quot;).copytodatatable.Rows(0).Item(&quot;Cons. Bal. CY&quot;).ToString.Trim,&quot;&quot;,&quot;Invalid&quot;}]" DataTable="[vDT_ValidateData]" DisplayName="Add Data Row" sap:VirtualizedContainerService.HintSize="200,22" sap2010:WorkflowViewState.IdRef="AddDataRow_17" />
+          </If.Else>
+        </If>
+      </If.Then>
+      <If.Else>
+        <ui:AddDataRow DataRow="{x:Null}" ArrayRow="[{&quot;300180&quot;,&quot;&quot;,&quot;&quot;,&quot;Account not present on ZBS report&quot;}]" DataTable="[vDT_ValidateData]" DisplayName="Add Data Row-ZBS" sap:VirtualizedContainerService.HintSize="200,22" sap2010:WorkflowViewState.IdRef="AddDataRow_18" />
+      </If.Else>
+    </If>
+    <ui:PathExists DisplayName="Path Exists" Exists="[vBoolZPLExists]" sap:VirtualizedContainerService.HintSize="484,51" sap2010:WorkflowViewState.IdRef="PathExists_3" Path="[In_Config(&quot;GL_SharedPath&quot;).ToString+In_Config(&quot;ShareFile_ReportsFolderName&quot;).ToString.Replace(&quot;&lt;Month&gt;&quot;,now.date.ToString(&quot;MMMMMMMMMMMMM&quot;))+&quot;Zpl1&quot;]" PathType="Folder">
+      <sap:WorkflowViewStateService.ViewState>
+        <scg:Dictionary x:TypeArguments="x:String, x:Object">
+          <x:Boolean x:Key="IsExpanded">False</x:Boolean>
+          <x:Boolean x:Key="IsPinned">False</x:Boolean>
+        </scg:Dictionary>
+      </sap:WorkflowViewStateService.ViewState>
+    </ui:PathExists>
+    <If Condition="[vBoolZPLExists]" DisplayName="If Folder Exists" sap:VirtualizedContainerService.HintSize="484,51" sap2010:WorkflowViewState.IdRef="If_21">
+      <sap:WorkflowViewStateService.ViewState>
+        <scg:Dictionary x:TypeArguments="x:String, x:Object">
+          <x:Boolean x:Key="IsExpanded">False</x:Boolean>
+          <x:Boolean x:Key="IsPinned">False</x:Boolean>
+        </scg:Dictionary>
+      </sap:WorkflowViewStateService.ViewState>
+      <If.Then>
+        <Assign DisplayName="Assign Get Files" sap:VirtualizedContainerService.HintSize="262,60" sap2010:WorkflowViewState.IdRef="Assign_15">
+          <Assign.To>
+            <OutArgument x:TypeArguments="scg:IEnumerable(x:String)">[vList_ReportFiles]</OutArgument>
+          </Assign.To>
+          <Assign.Value>
+            <InArgument x:TypeArguments="sl:IOrderedEnumerable(x:String)">[Directory.GetFiles(In_Config("GL_SharedPath").ToString+In_Config("ShareFile_ReportsFolderName").ToString.Replace("&lt;Month&gt;",now.date.ToString("MMMMMMMMMMMMM"))+"Zpl1").OrderByDescending(Function(d) New FileInfo(d).CreatedDate)]</InArgument>
+          </Assign.Value>
+          <sap:WorkflowViewStateService.ViewState>
+            <scg:Dictionary x:TypeArguments="x:String, x:Object">
+              <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+            </scg:Dictionary>
+          </sap:WorkflowViewStateService.ViewState>
+        </Assign>
+      </If.Then>
+      <If.Else>
+        <Assign DisplayName="Assign Get Files- 0" sap:VirtualizedContainerService.HintSize="262,60" sap2010:WorkflowViewState.IdRef="Assign_16">
+          <Assign.To>
+            <OutArgument x:TypeArguments="scg:IEnumerable(x:String)">[vList_ReportFiles]</OutArgument>
+          </Assign.To>
+          <Assign.Value>
+            <InArgument x:TypeArguments="scg:List(x:String)">[new List(of string)]</InArgument>
+          </Assign.Value>
+          <sap:WorkflowViewStateService.ViewState>
+            <scg:Dictionary x:TypeArguments="x:String, x:Object">
+              <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+            </scg:Dictionary>
+          </sap:WorkflowViewStateService.ViewState>
+        </Assign>
+      </If.Else>
+    </If>
+    <If Condition="[vList_ReportFiles.Count&gt;0]" DisplayName="If ZPL1 Present" sap:VirtualizedContainerService.HintSize="484,51" sap2010:WorkflowViewState.IdRef="If_20">
+      <sap:WorkflowViewStateService.ViewState>
+        <scg:Dictionary x:TypeArguments="x:String, x:Object">
+          <x:Boolean x:Key="IsExpanded">False</x:Boolean>
+          <x:Boolean x:Key="IsPinned">False</x:Boolean>
+        </scg:Dictionary>
+      </sap:WorkflowViewStateService.ViewState>
+      <If.Then>
+        <Sequence sap:VirtualizedContainerService.HintSize="304,343" sap2010:WorkflowViewState.IdRef="Sequence_17">
+          <sap:WorkflowViewStateService.ViewState>
+            <scg:Dictionary x:TypeArguments="x:String, x:Object">
+              <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+              <x:Boolean x:Key="IsPinned">False</x:Boolean>
+            </scg:Dictionary>
+          </sap:WorkflowViewStateService.ViewState>
+          <Assign DisplayName="Assign Zbs Path" sap:VirtualizedContainerService.HintSize="262,60" sap2010:WorkflowViewState.IdRef="Assign_13">
+            <Assign.To>
+              <OutArgument x:TypeArguments="x:String">[In_StrZPL1FilePath]</OutArgument>
+            </Assign.To>
+            <Assign.Value>
+              <InArgument x:TypeArguments="x:String">[Directory.GetFiles(In_Config("GL_SharedPath").ToString+In_Config("ShareFile_ReportsFolderName").ToString.Replace("&lt;Month&gt;",now.date.ToString("MMMMMMMMMMMMM"))+"Zpl1","*.xls",SearchOption.AllDirectories).OrderByDescending(Function(d) New FileInfo(d).CreationTime).Tolist(0)]</InArgument>
+            </Assign.Value>
+          </Assign>
+          <Assign DisplayName="Assign Create date" sap:VirtualizedContainerService.HintSize="262,60" sap2010:WorkflowViewState.IdRef="Assign_14">
+            <Assign.To>
+              <OutArgument x:TypeArguments="s:DateTime">[vTime_FileCreationDate]</OutArgument>
+            </Assign.To>
+            <Assign.Value>
+              <InArgument x:TypeArguments="s:DateTime">[new FileInfo(In_StrZBSFilePath).CreationTime]</InArgument>
+            </Assign.Value>
+          </Assign>
+          <If Condition="[vTime_FileCreationDate&gt;In_ProcessSartTime]" DisplayName="If ZPL file present" sap:VirtualizedContainerService.HintSize="262,51" sap2010:WorkflowViewState.IdRef="If_15">
+            <sap:WorkflowViewStateService.ViewState>
+              <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                <x:Boolean x:Key="IsExpanded">False</x:Boolean>
+                <x:Boolean x:Key="IsPinned">False</x:Boolean>
+              </scg:Dictionary>
+            </sap:WorkflowViewStateService.ViewState>
+            <If.Then>
+              <Sequence sap:VirtualizedContainerService.HintSize="376,270" sap2010:WorkflowViewState.IdRef="Sequence_14">
+                <sap:WorkflowViewStateService.ViewState>
+                  <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                    <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+                  </scg:Dictionary>
+                </sap:WorkflowViewStateService.ViewState>
+                <ui:InvokeWorkflowFile ContinueOnError="{x:Null}" DisplayName="Invoke LogFile workflow-LOG-GL71" sap:VirtualizedContainerService.HintSize="334,87" sap2010:WorkflowViewState.IdRef="InvokeWorkflowFile_5" UnSafe="False" WorkflowFileName="LogandReport\LogFile.xaml">
+                  <ui:InvokeWorkflowFile.Arguments>
+                    <InArgument x:TypeArguments="x:String" x:Key="argIstrLogNumber">LOG-GL71</InArgument>
+                    <InArgument x:TypeArguments="scg:Dictionary(x:String, x:Object)" x:Key="argIdicConfig">[In_Config]</InArgument>
+                    <InArgument x:TypeArguments="x:String" x:Key="argIstrKeyValues">[In_StrZPL1FilePath]</InArgument>
+                    <InArgument x:TypeArguments="x:String" x:Key="argIstrErrorScreenshot" />
+                    <InArgument x:TypeArguments="sd:DataTable" x:Key="argIdtLogNotification">[In_LogNotifications]</InArgument>
+                    <InArgument x:TypeArguments="x:String" x:Key="arglstrTechincalExceptionMessage" />
+                    <OutArgument x:TypeArguments="x:String" x:Key="argOException" />
+                    <InArgument x:TypeArguments="x:Int32" x:Key="argIstrTransactionID" />
+                    <InArgument x:TypeArguments="x:String" x:Key="argInDBConnectionString">[In_Config("DB_ConnectionString").ToString]</InArgument>
+                  </ui:InvokeWorkflowFile.Arguments>
+                  <sap:WorkflowViewStateService.ViewState>
+                    <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                      <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+                      <x:Boolean x:Key="IsPinned">False</x:Boolean>
+                    </scg:Dictionary>
+                  </sap:WorkflowViewStateService.ViewState>
+                </ui:InvokeWorkflowFile>
+                <ui:ReadRange AddHeaders="True" DataTable="[vDT_ZPLData]" DisplayName="Read Range" sap:VirtualizedContainerService.HintSize="334,51" sap2010:WorkflowViewState.IdRef="ReadRange_5" SheetName="[In_Config(&quot;ReportsSheetName&quot;).ToString]" WorkbookPath="[In_StrZPL1FilePath]">
+                  <ui:ReadRange.Range>
+                    <InArgument x:TypeArguments="x:String">
+                      <Literal x:TypeArguments="x:String" Value="" />
+                    </InArgument>
+                  </ui:ReadRange.Range>
+                  <sap:WorkflowViewStateService.ViewState>
+                    <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                      <x:Boolean x:Key="IsExpanded">False</x:Boolean>
+                      <x:Boolean x:Key="IsPinned">False</x:Boolean>
+                    </scg:Dictionary>
+                  </sap:WorkflowViewStateService.ViewState>
+                </ui:ReadRange>
+              </Sequence>
+            </If.Then>
+            <If.Else>
+              <Sequence sap:VirtualizedContainerService.HintSize="200,66" sap2010:WorkflowViewState.IdRef="Sequence_9">
+                <sap:WorkflowViewStateService.ViewState>
+                  <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                    <x:Boolean x:Key="IsExpanded">False</x:Boolean>
+                    <x:Boolean x:Key="IsPinned">False</x:Boolean>
+                  </scg:Dictionary>
+                </sap:WorkflowViewStateService.ViewState>
+                <ui:InvokeWorkflowFile ContinueOnError="{x:Null}" DisplayName="Invoke LogFile workflow-LOG-GL70" sap:VirtualizedContainerService.HintSize="200,51" sap2010:WorkflowViewState.IdRef="InvokeWorkflowFile_4" UnSafe="False" WorkflowFileName="LogandReport\LogFile.xaml">
+                  <ui:InvokeWorkflowFile.Arguments>
+                    <InArgument x:TypeArguments="x:String" x:Key="argIstrLogNumber">LOG-GL70</InArgument>
+                    <InArgument x:TypeArguments="scg:Dictionary(x:String, x:Object)" x:Key="argIdicConfig">[In_Config]</InArgument>
+                    <InArgument x:TypeArguments="x:String" x:Key="argIstrKeyValues">Validation</InArgument>
+                    <InArgument x:TypeArguments="x:String" x:Key="argIstrErrorScreenshot" />
+                    <InArgument x:TypeArguments="sd:DataTable" x:Key="argIdtLogNotification">[In_LogNotifications]</InArgument>
+                    <InArgument x:TypeArguments="x:String" x:Key="arglstrTechincalExceptionMessage" />
+                    <OutArgument x:TypeArguments="x:String" x:Key="argOException" />
+                    <InArgument x:TypeArguments="x:Int32" x:Key="argIstrTransactionID" />
+                    <InArgument x:TypeArguments="x:String" x:Key="argInDBConnectionString">[In_Config("DB_ConnectionString").ToString]</InArgument>
+                  </ui:InvokeWorkflowFile.Arguments>
+                  <sap:WorkflowViewStateService.ViewState>
+                    <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                      <x:Boolean x:Key="IsExpanded">False</x:Boolean>
+                      <x:Boolean x:Key="IsPinned">False</x:Boolean>
+                    </scg:Dictionary>
+                  </sap:WorkflowViewStateService.ViewState>
+                </ui:InvokeWorkflowFile>
+                <ui:AddDataRow DataRow="{x:Null}" ArrayRow="[{&quot;300135&quot;,&quot;&quot;,&quot;&quot;,&quot;ZPL file not present to perform validation&quot;}]" DataTable="[vDT_ValidateData]" DisplayName="Add Data Row-ZBS" sap:VirtualizedContainerService.HintSize="200,22" sap2010:WorkflowViewState.IdRef="AddDataRow_19" />
+                <ui:WriteRange AddHeaders="True" DataTable="[vDT_ValidateData]" DisplayName="Write Variant Report Range" sap:VirtualizedContainerService.HintSize="200,51" sap2010:WorkflowViewState.IdRef="WriteRange_6" SheetName="Validation- Exception" StartingCell="A1" WorkbookPath="[In_StrReportPath]">
+                  <sap:WorkflowViewStateService.ViewState>
+                    <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                      <x:Boolean x:Key="IsExpanded">False</x:Boolean>
+                      <x:Boolean x:Key="IsPinned">False</x:Boolean>
+                    </scg:Dictionary>
+                  </sap:WorkflowViewStateService.ViewState>
+                </ui:WriteRange>
+                <Throw Exception="[new BusinessRuleException(&quot; ZPL File NoT Found&quot;)]" sap:VirtualizedContainerService.HintSize="200,22" sap2010:WorkflowViewState.IdRef="Throw_6" />
+              </Sequence>
+            </If.Else>
+          </If>
+        </Sequence>
+      </If.Then>
+      <If.Else>
+        <Sequence sap:VirtualizedContainerService.HintSize="242,358" sap2010:WorkflowViewState.IdRef="Sequence_18">
+          <sap:WorkflowViewStateService.ViewState>
+            <scg:Dictionary x:TypeArguments="x:String, x:Object">
+              <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+              <x:Boolean x:Key="IsPinned">False</x:Boolean>
+            </scg:Dictionary>
+          </sap:WorkflowViewStateService.ViewState>
+          <ui:InvokeWorkflowFile ContinueOnError="{x:Null}" DisplayName="Invoke LogFile workflow-LOG-GL70" sap:VirtualizedContainerService.HintSize="200,51" sap2010:WorkflowViewState.IdRef="InvokeWorkflowFile_7" UnSafe="False" WorkflowFileName="LogandReport\LogFile.xaml">
+            <ui:InvokeWorkflowFile.Arguments>
+              <InArgument x:TypeArguments="x:String" x:Key="argIstrLogNumber">LOG-GL70</InArgument>
+              <InArgument x:TypeArguments="scg:Dictionary(x:String, x:Object)" x:Key="argIdicConfig">[In_Config]</InArgument>
+              <InArgument x:TypeArguments="x:String" x:Key="argIstrKeyValues">Validation</InArgument>
+              <InArgument x:TypeArguments="x:String" x:Key="argIstrErrorScreenshot" />
+              <InArgument x:TypeArguments="sd:DataTable" x:Key="argIdtLogNotification">[In_LogNotifications]</InArgument>
+              <InArgument x:TypeArguments="x:String" x:Key="arglstrTechincalExceptionMessage" />
+              <OutArgument x:TypeArguments="x:String" x:Key="argOException" />
+              <InArgument x:TypeArguments="x:Int32" x:Key="argIstrTransactionID" />
+              <InArgument x:TypeArguments="x:String" x:Key="argInDBConnectionString">[In_Config("DB_ConnectionString").ToString]</InArgument>
+            </ui:InvokeWorkflowFile.Arguments>
+            <sap:WorkflowViewStateService.ViewState>
+              <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                <x:Boolean x:Key="IsExpanded">False</x:Boolean>
+                <x:Boolean x:Key="IsPinned">False</x:Boolean>
+              </scg:Dictionary>
+            </sap:WorkflowViewStateService.ViewState>
+          </ui:InvokeWorkflowFile>
+          <ui:AddDataRow DataRow="{x:Null}" ArrayRow="[{&quot;300135&quot;,&quot;&quot;,&quot;&quot;,&quot;ZPL file not present to perform validation&quot;}]" DataTable="[vDT_ValidateData]" DisplayName="Add Data Row-ZBS" sap:VirtualizedContainerService.HintSize="200,22" sap2010:WorkflowViewState.IdRef="AddDataRow_23" />
+          <ui:WriteRange AddHeaders="True" DataTable="[vDT_ValidateData]" DisplayName="Write Variant Report Range" sap:VirtualizedContainerService.HintSize="200,51" sap2010:WorkflowViewState.IdRef="WriteRange_10" SheetName="Validation- Exception" StartingCell="A1" WorkbookPath="[In_StrReportPath]">
+            <sap:WorkflowViewStateService.ViewState>
+              <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                <x:Boolean x:Key="IsExpanded">False</x:Boolean>
+                <x:Boolean x:Key="IsPinned">False</x:Boolean>
+              </scg:Dictionary>
+            </sap:WorkflowViewStateService.ViewState>
+          </ui:WriteRange>
+          <Throw Exception="[new BusinessRuleException(&quot; ZPL File NoT Found&quot;)]" sap:VirtualizedContainerService.HintSize="200,22" sap2010:WorkflowViewState.IdRef="Throw_8" />
+        </Sequence>
+      </If.Else>
+    </If>
+    <If Condition="[vDT_ZBSData.Select(&quot;[Lead column] like '%&quot;+In_Config(&quot;GL_ValidationAccount3&quot;).ToString+&quot;%'&quot;).Length&gt;0]" DisplayName="If 300135 account present" sap:VirtualizedContainerService.HintSize="484,51" sap2010:WorkflowViewState.IdRef="If_16">
+      <sap:WorkflowViewStateService.ViewState>
+        <scg:Dictionary x:TypeArguments="x:String, x:Object">
+          <x:Boolean x:Key="IsExpanded">False</x:Boolean>
+          <x:Boolean x:Key="IsPinned">False</x:Boolean>
+        </scg:Dictionary>
+      </sap:WorkflowViewStateService.ViewState>
+      <If.Then>
+        <Sequence sap:VirtualizedContainerService.HintSize="376,445" sap2010:WorkflowViewState.IdRef="Sequence_10">
+          <Sequence.Variables>
+            <Variable x:TypeArguments="x:String" Name="vStr_NetIncome" />
+          </Sequence.Variables>
+          <sap:WorkflowViewStateService.ViewState>
+            <scg:Dictionary x:TypeArguments="x:String, x:Object">
+              <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+            </scg:Dictionary>
+          </sap:WorkflowViewStateService.ViewState>
+          <Assign DisplayName="Assign Current Earnings" sap:VirtualizedContainerService.HintSize="334,60" sap2010:WorkflowViewState.IdRef="Assign_4">
+            <Assign.To>
+              <OutArgument x:TypeArguments="x:String">[vStr_EarningValue]</OutArgument>
+            </Assign.To>
+            <Assign.Value>
+              <InArgument x:TypeArguments="x:String">[vDT_ZBSData.Select("[Lead column] like '%"+In_Config("GL_ValidationAccount3").ToString+"%'").copytodatatable.Rows(0).Item("Cons. Bal. CY").ToString]</InArgument>
+            </Assign.Value>
+          </Assign>
+          <ui:LogMessage DisplayName="Log Message" sap:VirtualizedContainerService.HintSize="334,91" sap2010:WorkflowViewState.IdRef="LogMessage_13" Level="Info" Message="[&quot;Net income is&quot; +vDT_ZPLData.Rows(vDT_ZPLData.Rows.Count-2).Item(&quot;YTD CY&quot;).ToString]">
+            <sap:WorkflowViewStateService.ViewState>
+              <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+                <x:Boolean x:Key="IsPinned">False</x:Boolean>
+              </scg:Dictionary>
+            </sap:WorkflowViewStateService.ViewState>
+          </ui:LogMessage>
+          <Assign sap:VirtualizedContainerService.HintSize="334,60" sap2010:WorkflowViewState.IdRef="Assign_5">
+            <Assign.To>
+              <OutArgument x:TypeArguments="x:String">[vStr_NetIncome]</OutArgument>
+            </Assign.To>
+            <Assign.Value>
+              <InArgument x:TypeArguments="x:String">[vDT_ZPLData.Rows(vDT_ZPLData.Rows.Count-1).Item("YTD CY").ToString]</InArgument>
+            </Assign.Value>
+          </Assign>
+          <ui:AddDataRow DataRow="{x:Null}" ArrayRow="[{In_Config(&quot;GL_ValidationAccount3&quot;).ToString,vStr_EarningValue,vStr_NetIncome,&quot;Invalid&quot;}]" DataTable="[vDT_ValidateData]" DisplayName="Add Data Row-ZBS" sap:VirtualizedContainerService.HintSize="334,22" sap2010:WorkflowViewState.IdRef="AddDataRow_20" />
+        </Sequence>
+      </If.Then>
+      <If.Else>
+        <ui:AddDataRow DataRow="{x:Null}" ArrayRow="[{&quot;300135&quot;,&quot;&quot;,&quot;&quot;,&quot;Account not present on ZBS report&quot;}]" DataTable="[vDT_ValidateData]" DisplayName="Add Data Row-ZBS" sap:VirtualizedContainerService.HintSize="200,22" sap2010:WorkflowViewState.IdRef="AddDataRow_21" />
+      </If.Else>
+    </If>
+    <ui:PathExists DisplayName="Path Exists- Validation Folder" Exists="[vBool_ValidFolderExists]" sap:VirtualizedContainerService.HintSize="484,51" sap2010:WorkflowViewState.IdRef="PathExists_2" Path="[In_Config(&quot;GL_SharedPath&quot;).ToString+In_Config(&quot;Balance_ValidationFolderName&quot;).ToString]" PathType="Folder">
+      <sap:WorkflowViewStateService.ViewState>
+        <scg:Dictionary x:TypeArguments="x:String, x:Object">
+          <x:Boolean x:Key="IsExpanded">False</x:Boolean>
+          <x:Boolean x:Key="IsPinned">False</x:Boolean>
+        </scg:Dictionary>
+      </sap:WorkflowViewStateService.ViewState>
+    </ui:PathExists>
+    <If Condition="[vBool_ValidFolderExists]" DisplayName="If Validation Folder Exsits" sap:VirtualizedContainerService.HintSize="484,51" sap2010:WorkflowViewState.IdRef="If_17">
+      <sap:WorkflowViewStateService.ViewState>
+        <scg:Dictionary x:TypeArguments="x:String, x:Object">
+          <x:Boolean x:Key="IsExpanded">False</x:Boolean>
+          <x:Boolean x:Key="IsPinned">False</x:Boolean>
+        </scg:Dictionary>
+      </sap:WorkflowViewStateService.ViewState>
+      <If.Else>
+        <ui:CreateDirectory ContinueOnError="{x:Null}" DisplayName="Create Folder- Validation" sap:VirtualizedContainerService.HintSize="334,84" sap2010:WorkflowViewState.IdRef="CreateDirectory_2" Path="[In_Config(&quot;GL_SharedPath&quot;).ToString+In_Config(&quot;Balance_ValidationFolderName&quot;).ToString]" />
+      </If.Else>
+    </If>
+    <If Condition="[vDT_ValidateData.Rows.Count&gt;0]" DisplayName="If Report has Data" sap:VirtualizedContainerService.HintSize="484,482" sap2010:WorkflowViewState.IdRef="If_18">
+      <sap:WorkflowViewStateService.ViewState>
+        <scg:Dictionary x:TypeArguments="x:String, x:Object">
+          <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+          <x:Boolean x:Key="IsPinned">False</x:Boolean>
+        </scg:Dictionary>
+      </sap:WorkflowViewStateService.ViewState>
+      <If.Then>
+        <Sequence sap:VirtualizedContainerService.HintSize="304,334" sap2010:WorkflowViewState.IdRef="Sequence_11">
+          <Sequence.Variables>
+            <Variable x:TypeArguments="x:String" Name="vStr_BalanceReportFileName" />
+          </Sequence.Variables>
+          <sap:WorkflowViewStateService.ViewState>
+            <scg:Dictionary x:TypeArguments="x:String, x:Object">
+              <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+            </scg:Dictionary>
+          </sap:WorkflowViewStateService.ViewState>
+          <Assign DisplayName="Assign Balance FIle" sap:VirtualizedContainerService.HintSize="262,60" sap2010:WorkflowViewState.IdRef="Assign_6">
+            <Assign.To>
+              <OutArgument x:TypeArguments="x:String">[vStr_BalanceReportFileName]</OutArgument>
+            </Assign.To>
+            <Assign.Value>
+              <InArgument x:TypeArguments="x:String">[In_Config("GLValidation_FileName").ToString.Replace("&lt;Time&gt;",now.ToString.Replace(":","").Replace("/",""))]</InArgument>
+            </Assign.Value>
+          </Assign>
+          <ui:WriteRange AddHeaders="True" DataTable="[vDT_ValidateData]" DisplayName="Write Variant Report Range" sap:VirtualizedContainerService.HintSize="262,51" sap2010:WorkflowViewState.IdRef="WriteRange_7" SheetName="Validation GR55" StartingCell="A1" WorkbookPath="[In_StrReportPath]">
+            <sap:WorkflowViewStateService.ViewState>
+              <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                <x:Boolean x:Key="IsExpanded">False</x:Boolean>
+                <x:Boolean x:Key="IsPinned">False</x:Boolean>
+              </scg:Dictionary>
+            </sap:WorkflowViewStateService.ViewState>
+          </ui:WriteRange>
+          <ui:WriteRange AddHeaders="True" DataTable="[vDT_ValidateData]" DisplayName="Write Variant Report Range" sap:VirtualizedContainerService.HintSize="262,51" sap2010:WorkflowViewState.IdRef="WriteRange_8" SheetName="Validation GR55" StartingCell="A1" WorkbookPath="[In_Config(&quot;GL_SharedPath&quot;).ToString+In_Config(&quot;Balance_ValidationFolderName&quot;).ToString+vStr_BalanceReportFileName]">
+            <sap:WorkflowViewStateService.ViewState>
+              <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                <x:Boolean x:Key="IsExpanded">False</x:Boolean>
+                <x:Boolean x:Key="IsPinned">False</x:Boolean>
+              </scg:Dictionary>
+            </sap:WorkflowViewStateService.ViewState>
+          </ui:WriteRange>
+        </Sequence>
+      </If.Then>
+    </If>
+  </Sequence>
+</Activity>
